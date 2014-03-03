@@ -12,30 +12,31 @@ namespace CtmQuerying
 			new Widget{ Id=1},
 			new Widget{ Id=2},
 			new Widget{ Id=3},
+			new Widget{ Id=4},
 		};
 
 		[Test()]
 		public void TestMax ()
 		{
-			var manager = new Manager {Max=2, repo=mockData.AsQueryable()};
-			var results = manager.GetStuff().ToList();
+			var manager = new Manager {repo=mockData.AsQueryable()};
+			// pagination (take) moved out of manager class as can be done entirely by client with IQueryable
+			var results = manager.GetStuff().Take(2).ToList();
 			Assert.AreEqual(2, results.Count);
 		}
 
 		[Test()]
 		public void TestFilter ()
 		{
-			var manager = new Manager {Max=2, repo=mockData.AsQueryable()};
-			var results = manager.GetStuff().Where(widget => widget.Id !=2).ToList();
+			var manager = new Manager {repo=mockData.AsQueryable()};
+			var results = manager.GetStuff().Where(widget => widget.Id !=2).Take (2).ToList();
 			Assert.AreEqual(2, results.Count);
 		}
 	}
 
 	class Manager{
-		public int Max { get; set; }
 		public IQueryable<Widget> repo { get; set; }
 		public IQueryable<Widget> GetStuff(){
-			return repo.Take(Max);
+			return repo;
 		}
 	}
 
